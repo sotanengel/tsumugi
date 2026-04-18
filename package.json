@@ -1,0 +1,15 @@
+{
+  "name": "tsumugi",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @tsumugi/desktop dev",
+    "build": "pnpm --filter @tsumugi/desktop build",
+    "preview": "pnpm --filter @tsumugi/desktop preview",
+    "lint": "biome check .",
+    "fmt": "biome check --write .",
+    "test": "echo 'no tests yet'"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  }
+}
