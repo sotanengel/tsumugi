@@ -218,3 +218,29 @@ pub fn probe_media(path: String) -> Result<MediaInfoDto, String> {
         fps: video_stream.and_then(|s| s.fps),
     })
 }
+
+#[derive(Deserialize)]
+pub struct ExportArgs {
+    pub input: String,
+    pub output: String,
+    pub preset: String,
+}
+
+#[tauri::command]
+pub fn export_media(args: ExportArgs) -> Result<String, String> {
+    let config = match args.preset.as_str() {
+        "sns_1080p" => media_io::ExportConfig::sns_1080p(),
+        "youtube_1080p" => media_io::ExportConfig::youtube_1080p(),
+        "youtube_4k" => media_io::ExportConfig::youtube_4k(),
+        other => return Err(format!("unknown preset: {other}")),
+    };
+
+    media_io::export_file(
+        &PathBuf::from(&args.input),
+        &PathBuf::from(&args.output),
+        &config,
+    )
+    .map_err(|e| e.to_string())?;
+
+    Ok(args.output)
+}

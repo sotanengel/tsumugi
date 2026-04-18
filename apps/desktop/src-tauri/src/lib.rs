@@ -15,6 +15,7 @@ pub fn run() {
             commands::remove_clip_cmd,
             commands::split_clip_cmd,
             commands::probe_media,
+            commands::export_media,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
