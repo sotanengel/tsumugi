@@ -4,6 +4,7 @@ import { MediaLibrary } from "./components/MediaLibrary";
 import { PreviewPanel } from "./components/PreviewPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
 import { Toolbar } from "./components/Toolbar";
+import { useKeyboardShortcuts } from "./hooks/use-keyboard-shortcuts";
 import { useTimelineStore } from "./store/timeline-store";
 
 export function App() {
@@ -12,6 +13,8 @@ export function App() {
   useEffect(() => {
     loadTimeline();
   }, [loadTimeline]);
+
+  useKeyboardShortcuts();
 
   return (
     <Tooltip.Provider delayDuration={300}>

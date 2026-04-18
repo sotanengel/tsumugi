@@ -3,7 +3,7 @@ import { convertFileSrc } from "@tauri-apps/api/core";
 import { useTimelineStore } from "../store/timeline-store";
 
 export function PreviewPanel() {
-  const { timeline, previewSource } = useTimelineStore();
+  const { timeline, previewSource, playbackRequested } = useTimelineStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -16,6 +16,19 @@ export function PreviewPanel() {
     setCurrentTime(0);
     setDuration(0);
   }, [previewSource]);
+
+  // Respond to keyboard shortcut playback toggle
+  useEffect(() => {
+    if (!playbackRequested || !videoRef.current) return;
+    if (playbackRequested === "play") {
+      videoRef.current.play();
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+    useTimelineStore.setState({ playbackRequested: null });
+  }, [playbackRequested]);
 
   const togglePlay = () => {
     const video = videoRef.current;
