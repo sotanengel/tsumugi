@@ -1,64 +1,42 @@
 import type { Track as TrackType } from "@tsumugi/timeline-types";
 import { useTimelineStore } from "../store/timeline-store";
 
+export const PIXELS_PER_FRAME = 2;
+
 function TrackRow({ track }: { track: TrackType }) {
   const { removeClip, removeTrack } = useTimelineStore();
 
   return (
-    <div style={{
-      display: "flex",
-      borderBottom: "1px solid #222",
-      minHeight: 48,
-    }}>
-      <div style={{
-        width: 120,
-        padding: "6px 6px",
-        background: "#16213e",
-        borderRight: "1px solid #222",
-        fontSize: 12,
-        flexShrink: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}>
+    <div className="flex border-b border-border-dim min-h-12">
+      <div className="w-30 px-1.5 py-1.5 bg-bg-track border-r border-border-dim text-xs shrink-0 flex items-center justify-between">
         <div>
-          <div style={{ fontWeight: 600 }}>{track.name}</div>
-          <div style={{ color: "#666", fontSize: 10 }}>
+          <div className="font-semibold">{track.name}</div>
+          <div className="text-text-dim text-[10px]">
             {track.clips.length} clip{track.clips.length !== 1 ? "s" : ""}
           </div>
         </div>
         <button
           type="button"
           onClick={() => removeTrack(track.id)}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#666",
-            cursor: "pointer",
-            fontSize: 14,
-            padding: "2px 4px",
-          }}
+          className="bg-transparent border-none text-text-dim cursor-pointer text-sm px-1 hover:text-error-text"
           title="Delete track"
         >
           ×
         </button>
       </div>
-      <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center" }}>
+      <div className="flex-1 relative flex items-center">
         {track.clips.map((clip) => (
           <div
             key={clip.id}
+            className="absolute h-9 rounded-sm px-1.5 py-0.5 text-[10px] overflow-hidden cursor-pointer border border-white/10"
             style={{
-              position: "absolute",
-              left: clip.timeline_start * 2,
-              width: (clip.timeline_end - clip.timeline_start) * 2,
-              height: 36,
-              background: clip.kind === "video" ? "#0f3460" : clip.kind === "audio" ? "#1a5276" : "#4a235a",
-              borderRadius: 3,
-              padding: "2px 6px",
-              fontSize: 10,
-              overflow: "hidden",
-              cursor: "pointer",
-              border: "1px solid rgba(255,255,255,0.1)",
+              left: clip.timeline_start * PIXELS_PER_FRAME,
+              width: (clip.timeline_end - clip.timeline_start) * PIXELS_PER_FRAME,
+              background: clip.kind === "video"
+                ? "var(--color-bg-clip-video)"
+                : clip.kind === "audio"
+                  ? "var(--color-bg-clip-audio)"
+                  : "var(--color-bg-clip-title)",
             }}
             onDoubleClick={() => removeClip(track.id, clip.id)}
             title={`${clip.kind}: ${clip.path || clip.text || ""} (double-click to remove)`}
@@ -76,20 +54,16 @@ export function TimelinePanel() {
 
   if (!timeline) {
     return (
-      <div style={{ padding: 20, textAlign: "center", color: "#555" }}>
+      <div className="p-5 text-center text-text-dim">
         Create a new project to get started
       </div>
     );
   }
 
   return (
-    <div style={{
-      flex: 1,
-      overflow: "auto",
-      borderTop: "1px solid #333",
-    }}>
+    <div className="flex-1 overflow-auto border-t border-border">
       {timeline.tracks.length === 0 && (
-        <div style={{ padding: 16, textAlign: "center", color: "#555", fontSize: 13 }}>
+        <div className="p-4 text-center text-text-dim text-sm">
           Add a track to begin editing
         </div>
       )}

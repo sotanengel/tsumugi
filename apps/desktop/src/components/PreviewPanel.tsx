@@ -4,31 +4,15 @@ export function PreviewPanel() {
   const { timeline } = useTimelineStore();
 
   return (
-    <div style={{
-      flex: 1,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "#000",
-      minHeight: 300,
-    }}>
+    <div className="flex-1 flex items-center justify-center bg-black min-h-[300px]">
       {timeline ? (
-        <div style={{
-          width: 480,
-          height: 270,
-          background: "#111",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: 4,
-          border: "1px solid #333",
-        }}>
-          <span style={{ color: "#444", fontSize: 14 }}>
+        <div className="w-[480px] h-[270px] bg-bg-primary flex items-center justify-center rounded border border-border">
+          <span className="text-text-dim text-sm">
             Preview (16:9) — {timeline.fps}fps
           </span>
         </div>
       ) : (
-        <span style={{ color: "#444" }}>No project loaded</span>
+        <span className="text-text-dim">No project loaded</span>
       )}
     </div>
   );

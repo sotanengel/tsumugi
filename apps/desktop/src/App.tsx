@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { MediaLibrary } from "./components/MediaLibrary";
 import { PreviewPanel } from "./components/PreviewPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
@@ -13,25 +14,20 @@ export function App() {
   }, [loadTimeline]);
 
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-      background: "#0a0a1a",
-      color: "#e0e0e0",
-      fontFamily: "system-ui, -apple-system, sans-serif",
-    }}>
-      <Toolbar />
-      {error && (
-        <div style={{ padding: "4px 12px", background: "#4a0000", color: "#ff6b6b", fontSize: 12 }}>
-          {error}
+    <Tooltip.Provider delayDuration={300}>
+      <div className="flex flex-col h-screen bg-bg-primary text-text-primary font-sans">
+        <Toolbar />
+        {error && (
+          <div className="px-3 py-1 bg-error-bg text-error-text text-xs">
+            {error}
+          </div>
+        )}
+        <div className="flex flex-1 overflow-hidden">
+          <MediaLibrary />
+          <PreviewPanel />
         </div>
-      )}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-        <MediaLibrary />
-        <PreviewPanel />
+        <TimelinePanel />
       </div>
-      <TimelinePanel />
-    </div>
+    </Tooltip.Provider>
   );
 }
