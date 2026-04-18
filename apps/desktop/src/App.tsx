@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { MediaLibrary } from "./components/MediaLibrary";
 import { PreviewPanel } from "./components/PreviewPanel";
+import { SplitPane } from "./components/SplitPane";
 import { TimelinePanel } from "./components/TimelinePanel";
 import { Toolbar } from "./components/Toolbar";
 import { useKeyboardShortcuts } from "./hooks/use-keyboard-shortcuts";
@@ -25,11 +26,26 @@ export function App() {
             {error}
           </div>
         )}
-        <div className="flex flex-1 overflow-hidden">
-          <MediaLibrary />
-          <PreviewPanel />
-        </div>
-        <TimelinePanel />
+        {/* Vertical split: top (media+preview) | bottom (timeline) */}
+        <SplitPane
+          direction="vertical"
+          initialSize={400}
+          minSize={100}
+          collapsible="both"
+        >
+          {/* Horizontal split: left (media library) | right (preview) */}
+          <SplitPane
+            direction="horizontal"
+            initialSize={220}
+            minSize={60}
+            maxSize={400}
+            collapsible="first"
+          >
+            <MediaLibrary />
+            <PreviewPanel />
+          </SplitPane>
+          <TimelinePanel />
+        </SplitPane>
       </div>
     </Tooltip.Provider>
   );

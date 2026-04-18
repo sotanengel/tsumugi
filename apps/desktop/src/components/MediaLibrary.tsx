@@ -13,7 +13,7 @@ export function MediaLibrary() {
   };
 
   return (
-    <div className="p-2 border-r border-border w-56 overflow-auto">
+    <div className="p-2 h-full overflow-auto">
       <h3 className="m-0 mb-2 text-xs text-text-muted font-semibold">
         Media ({mediaLibrary.length})
       </h3>
