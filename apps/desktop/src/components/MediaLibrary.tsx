@@ -2,7 +2,7 @@ import type { MediaInfo } from "@tsumugi/timeline-types";
 import { useTimelineStore } from "../store/timeline-store";
 
 export function MediaLibrary() {
-  const { mediaLibrary } = useTimelineStore();
+  const { mediaLibrary, previewSource, setPreviewSource } = useTimelineStore();
 
   const handleDragStart = (e: React.DragEvent, media: MediaInfo) => {
     e.dataTransfer.setData(
@@ -25,7 +25,8 @@ export function MediaLibrary() {
           key={m.path}
           draggable
           onDragStart={(e) => handleDragStart(e, m)}
-          className="p-1.5 mb-1 bg-bg-track rounded text-xs cursor-grab active:opacity-50"
+          onClick={() => setPreviewSource(m.path)}
+          className={`p-1.5 mb-1 rounded text-xs cursor-grab active:opacity-50 ${previewSource === m.path ? "bg-blue-900/50 ring-1 ring-blue-500" : "bg-bg-track"}`}
           title={m.path}
         >
           <div className="font-semibold truncate">
