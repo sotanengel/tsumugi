@@ -16,6 +16,8 @@ interface TimelineState {
   addClip: (args: AddClipArgs) => Promise<void>;
   removeClip: (trackId: string, clipId: string) => Promise<void>;
   splitClip: (trackId: string, clipId: string, atFrame: number) => Promise<void>;
+  undo: () => Promise<void>;
+  redo: () => Promise<void>;
   importMedia: (path: string) => Promise<void>;
 }
 
@@ -87,6 +89,24 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
       set({ timeline });
     } catch (e) {
       set({ error: String(e) });
+    }
+  },
+
+  undo: async () => {
+    try {
+      const timeline = await api.undo();
+      set({ timeline, error: null });
+    } catch (_e) {
+      // Silently ignore "nothing to undo"
+    }
+  },
+
+  redo: async () => {
+    try {
+      const timeline = await api.redo();
+      set({ timeline, error: null });
+    } catch (_e) {
+      // Silently ignore "nothing to redo"
     }
   },
 

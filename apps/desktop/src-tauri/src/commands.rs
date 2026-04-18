@@ -5,18 +5,20 @@ use serde::{Deserialize, Serialize};
 use tauri::State;
 
 use timeline_engine::{
-    add_clip, add_track, make_clip, remove_clip, split_clip, ClipKind, Timeline,
+    add_clip, add_track, make_clip, remove_clip, split_clip, ClipKind, History, Timeline,
 };
 
-/// Application state holding the current timeline.
+/// Application state holding the current timeline and undo history.
 pub struct AppState {
     pub timeline: Mutex<Timeline>,
+    pub history: Mutex<History>,
 }
 
 impl Default for AppState {
     fn default() -> Self {
         Self {
             timeline: Mutex::new(Timeline::new(30)),
+            history: Mutex::new(History::new()),
         }
     }
 }
@@ -98,6 +100,8 @@ pub fn get_timeline(state: State<AppState>) -> TimelineDto {
 #[tauri::command]
 pub fn create_new_timeline(state: State<AppState>, fps: u32) -> TimelineDto {
     let mut tl = state.timeline.lock().unwrap();
+    let mut hist = state.history.lock().unwrap();
+    hist.clear();
     *tl = Timeline::new(fps);
     timeline_to_dto(&tl)
 }
@@ -105,6 +109,8 @@ pub fn create_new_timeline(state: State<AppState>, fps: u32) -> TimelineDto {
 #[tauri::command]
 pub fn add_track_cmd(state: State<AppState>, name: String) -> Result<TimelineDto, String> {
     let mut tl = state.timeline.lock().unwrap();
+    let mut hist = state.history.lock().unwrap();
+    hist.save(&tl);
     add_track(&mut tl, name);
     Ok(timeline_to_dto(&tl))
 }
@@ -112,6 +118,8 @@ pub fn add_track_cmd(state: State<AppState>, name: String) -> Result<TimelineDto
 #[tauri::command]
 pub fn remove_track_cmd(state: State<AppState>, track_id: String) -> Result<TimelineDto, String> {
     let mut tl = state.timeline.lock().unwrap();
+    let mut hist = state.history.lock().unwrap();
+    hist.save(&tl);
     let tid: uuid::Uuid = track_id.parse().map_err(|e| format!("{e}"))?;
     let pos = tl
         .tracks
@@ -135,6 +143,8 @@ pub struct AddClipArgs {
 #[tauri::command]
 pub fn add_clip_cmd(state: State<AppState>, args: AddClipArgs) -> Result<TimelineDto, String> {
     let mut tl = state.timeline.lock().unwrap();
+    let mut hist = state.history.lock().unwrap();
+    hist.save(&tl);
     let track_id: uuid::Uuid = args.track_id.parse().map_err(|e| format!("{e}"))?;
 
     let kind = match args.kind.as_str() {
@@ -166,6 +176,8 @@ pub fn remove_clip_cmd(
     clip_id: String,
 ) -> Result<TimelineDto, String> {
     let mut tl = state.timeline.lock().unwrap();
+    let mut hist = state.history.lock().unwrap();
+    hist.save(&tl);
     let tid: uuid::Uuid = track_id.parse().map_err(|e| format!("{e}"))?;
     let cid: uuid::Uuid = clip_id.parse().map_err(|e| format!("{e}"))?;
     {
@@ -184,6 +196,8 @@ pub fn split_clip_cmd(
     at_frame: u64,
 ) -> Result<TimelineDto, String> {
     let mut tl = state.timeline.lock().unwrap();
+    let mut hist = state.history.lock().unwrap();
+    hist.save(&tl);
     let tid: uuid::Uuid = track_id.parse().map_err(|e| format!("{e}"))?;
     let cid: uuid::Uuid = clip_id.parse().map_err(|e| format!("{e}"))?;
     {
@@ -256,4 +270,32 @@ pub fn export_media(args: ExportArgs) -> Result<String, String> {
     .map_err(|e| e.to_string())?;
 
     Ok(args.output)
+}
+
+// -- Undo/Redo commands --
+
+#[tauri::command]
+pub fn undo_cmd(state: State<AppState>) -> Result<TimelineDto, String> {
+    let mut tl = state.timeline.lock().unwrap();
+    let mut hist = state.history.lock().unwrap();
+    match hist.undo(&tl) {
+        Some(prev) => {
+            *tl = prev;
+            Ok(timeline_to_dto(&tl))
+        }
+        None => Err("nothing to undo".into()),
+    }
+}
+
+#[tauri::command]
+pub fn redo_cmd(state: State<AppState>) -> Result<TimelineDto, String> {
+    let mut tl = state.timeline.lock().unwrap();
+    let mut hist = state.history.lock().unwrap();
+    match hist.redo(&tl) {
+        Some(next) => {
+            *tl = next;
+            Ok(timeline_to_dto(&tl))
+        }
+        None => Err("nothing to redo".into()),
+    }
 }

@@ -36,6 +36,14 @@ export async function splitClip(
   return invoke<Timeline>("split_clip_cmd", { trackId, clipId, atFrame });
 }
 
+export async function undo(): Promise<Timeline> {
+  return invoke<Timeline>("undo_cmd");
+}
+
+export async function redo(): Promise<Timeline> {
+  return invoke<Timeline>("redo_cmd");
+}
+
 export async function probeMedia(path: string): Promise<MediaInfo> {
   return invoke<MediaInfo>("probe_media", { path });
 }
