@@ -1,0 +1,27 @@
+name: Feature Request
+description: Suggest a new feature for Tsumugi
+labels: [enhancement]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What feature would you like and why?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds or alternative approaches?
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Area
+      options:
+        - Timeline / Editing
+        - Export / Rendering
+        - UI / UX
+        - MCP / AI integration
+        - Performance
+        - Other
