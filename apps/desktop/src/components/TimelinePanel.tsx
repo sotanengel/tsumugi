@@ -102,7 +102,7 @@ export function TimelinePanel() {
   }
 
   return (
-    <div className="flex-1 overflow-auto border-t border-border" onClick={deselectClip}>
+    <div className="h-full overflow-auto" onClick={deselectClip}>
       {timeline.tracks.length === 0 && (
         <div className="p-4 text-center text-text-dim text-sm">
           Add a track to begin editing
