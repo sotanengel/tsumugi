@@ -79,7 +79,7 @@ export function PreviewPanel() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center bg-black min-h-[300px]">
+    <div className="flex flex-col items-center justify-center bg-black w-full h-full overflow-hidden">
       {loading && (
         <span className="text-text-muted text-sm">Loading preview...</span>
       )}
@@ -91,7 +91,7 @@ export function PreviewPanel() {
           <video
             ref={videoRef}
             src={dataUrl}
-            className="max-w-full max-h-[calc(100%-48px)] object-contain"
+            className="max-w-full object-contain flex-1 min-h-0"
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={() => {
               if (videoRef.current) setDuration(videoRef.current.duration);
