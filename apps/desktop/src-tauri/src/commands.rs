@@ -109,6 +109,19 @@ pub fn add_track_cmd(state: State<AppState>, name: String) -> Result<TimelineDto
     Ok(timeline_to_dto(&tl))
 }
 
+#[tauri::command]
+pub fn remove_track_cmd(state: State<AppState>, track_id: String) -> Result<TimelineDto, String> {
+    let mut tl = state.timeline.lock().unwrap();
+    let tid: uuid::Uuid = track_id.parse().map_err(|e| format!("{e}"))?;
+    let pos = tl
+        .tracks
+        .iter()
+        .position(|t| t.id == tid)
+        .ok_or_else(|| format!("track not found: {tid}"))?;
+    tl.tracks.remove(pos);
+    Ok(timeline_to_dto(&tl))
+}
+
 #[derive(Deserialize)]
 pub struct AddClipArgs {
     pub track_id: String,

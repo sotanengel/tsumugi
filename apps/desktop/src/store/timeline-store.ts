@@ -12,6 +12,7 @@ interface TimelineState {
   loadTimeline: () => Promise<void>;
   createTimeline: (fps: number) => Promise<void>;
   addTrack: (name: string) => Promise<void>;
+  removeTrack: (trackId: string) => Promise<void>;
   addClip: (args: AddClipArgs) => Promise<void>;
   removeClip: (trackId: string, clipId: string) => Promise<void>;
   splitClip: (trackId: string, clipId: string, atFrame: number) => Promise<void>;
@@ -47,6 +48,15 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
   addTrack: async (name) => {
     try {
       const timeline = await api.addTrack(name);
+      set({ timeline });
+    } catch (e) {
+      set({ error: String(e) });
+    }
+  },
+
+  removeTrack: async (trackId) => {
+    try {
+      const timeline = await api.removeTrack(trackId);
       set({ timeline });
     } catch (e) {
       set({ error: String(e) });

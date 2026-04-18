@@ -11,6 +11,7 @@ pub fn run() {
             commands::get_timeline,
             commands::create_new_timeline,
             commands::add_track_cmd,
+            commands::remove_track_cmd,
             commands::add_clip_cmd,
             commands::remove_clip_cmd,
             commands::split_clip_cmd,
