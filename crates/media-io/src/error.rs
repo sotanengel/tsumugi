@@ -17,4 +17,10 @@ pub enum MediaIoError {
 
     #[error("file not found: {0}")]
     FileNotFound(PathBuf),
+
+    #[error("ffmpeg not found in PATH")]
+    FfmpegNotFound,
+
+    #[error("encoding failed: {message}")]
+    EncodeFailed { message: String },
 }
