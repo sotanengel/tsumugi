@@ -3722,6 +3722,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "timeline-engine"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "thiserror 2.0.18",
+ "uuid",
+]
+
+[[package]]
 name = "tinystr"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
