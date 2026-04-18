@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { convertFileSrc } from "@tauri-apps/api/core";
 import { useTimelineStore } from "../store/timeline-store";
+
+function toAssetUrl(filePath: string): string {
+  // Tauri 2 macOS uses https://asset.localhost/ for serving local files.
+  // convertFileSrc encodes '/' as '%2F' which breaks video playback.
+  return `https://asset.localhost/${encodeURI(filePath)}`;
+}
 
 export function PreviewPanel() {
   const { timeline, previewSource, playbackRequested } = useTimelineStore();
@@ -10,7 +15,7 @@ export function PreviewPanel() {
   const [duration, setDuration] = useState(0);
   const [videoError, setVideoError] = useState<string | null>(null);
 
-  const assetUrl = previewSource ? convertFileSrc(previewSource) : null;
+  const assetUrl = previewSource ? toAssetUrl(previewSource) : null;
 
   useEffect(() => {
     setIsPlaying(false);
