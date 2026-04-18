@@ -53,4 +53,30 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-      - run: cargo test --workspace
+      - run: cargo install cargo-tarpaulin
+      - name: Run tests with coverage
+        run: >
+          cargo tarpaulin
+          --workspace
+          --exclude tsumugi-desktop
+          --out xml
+          --output-dir coverage
+          --skip-clean
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-report
+          path: coverage/cobertura.xml
+
+  sbom:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
+      - run: cargo install cargo-cyclonedx
+      - run: cargo cyclonedx --format json --output-cdx
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sbom
+          path: ./**/bom.cdx.json
