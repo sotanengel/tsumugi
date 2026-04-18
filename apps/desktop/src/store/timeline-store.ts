@@ -19,10 +19,13 @@ interface TimelineState {
   undo: () => Promise<void>;
   redo: () => Promise<void>;
   importMedia: (path: string) => Promise<void>;
+  previewSource: string | null;
+  setPreviewSource: (path: string | null) => void;
 }
 
 export const useTimelineStore = create<TimelineState>((set, get) => ({
   timeline: null,
+  previewSource: null,
   mediaLibrary: [],
   loading: false,
   error: null,
@@ -117,5 +120,9 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     } catch (e) {
       set({ error: String(e) });
     }
+  },
+
+  setPreviewSource: (path) => {
+    set({ previewSource: path });
   },
 }));
