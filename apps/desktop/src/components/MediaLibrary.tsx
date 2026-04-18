@@ -1,7 +1,16 @@
+import type { MediaInfo } from "@tsumugi/timeline-types";
 import { useTimelineStore } from "../store/timeline-store";
 
 export function MediaLibrary() {
   const { mediaLibrary } = useTimelineStore();
+
+  const handleDragStart = (e: React.DragEvent, media: MediaInfo) => {
+    e.dataTransfer.setData(
+      "application/tsumugi-media",
+      JSON.stringify(media),
+    );
+    e.dataTransfer.effectAllowed = "copy";
+  };
 
   return (
     <div className="p-2 border-r border-border w-56 overflow-auto">
@@ -14,7 +23,9 @@ export function MediaLibrary() {
       {mediaLibrary.map((m) => (
         <div
           key={m.path}
-          className="p-1.5 mb-1 bg-bg-track rounded text-xs cursor-grab"
+          draggable
+          onDragStart={(e) => handleDragStart(e, m)}
+          className="p-1.5 mb-1 bg-bg-track rounded text-xs cursor-grab active:opacity-50"
           title={m.path}
         >
           <div className="font-semibold truncate">
