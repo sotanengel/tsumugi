@@ -5,7 +5,7 @@ import { useTimelineStore } from "../store/timeline-store";
 export const PIXELS_PER_FRAME = 2;
 
 function TrackRow({ track }: { track: TrackType }) {
-  const { removeClip, removeTrack, addClip, timeline } = useTimelineStore();
+  const { removeClip, removeTrack, addClip, timeline, selectClip, selectedClipId } = useTimelineStore();
   const [dragOver, setDragOver] = useState(false);
   const clipAreaRef = useRef<HTMLDivElement>(null);
 
@@ -68,7 +68,7 @@ function TrackRow({ track }: { track: TrackType }) {
         {track.clips.map((clip) => (
           <div
             key={clip.id}
-            className="absolute h-9 rounded-sm px-1.5 py-0.5 text-[10px] overflow-hidden cursor-pointer border border-white/10"
+            className={`absolute h-9 rounded-sm px-1.5 py-0.5 text-[10px] overflow-hidden cursor-pointer border ${selectedClipId === clip.id ? "border-blue-400 ring-1 ring-blue-400/50" : "border-white/10"}`}
             style={{
               left: clip.timeline_start * PIXELS_PER_FRAME,
               width: (clip.timeline_end - clip.timeline_start) * PIXELS_PER_FRAME,
@@ -78,8 +78,9 @@ function TrackRow({ track }: { track: TrackType }) {
                   ? "var(--color-bg-clip-audio)"
                   : "var(--color-bg-clip-title)",
             }}
+            onClick={(e) => { e.stopPropagation(); selectClip(track.id, clip.id); }}
             onDoubleClick={() => removeClip(track.id, clip.id)}
-            title={`${clip.kind}: ${clip.path || clip.text || ""} (double-click to remove)`}
+            title={`${clip.kind}: ${clip.path || clip.text || ""}`}
           >
             <span>{clip.path?.split("/").pop() || clip.text || clip.kind}</span>
           </div>
@@ -90,7 +91,7 @@ function TrackRow({ track }: { track: TrackType }) {
 }
 
 export function TimelinePanel() {
-  const { timeline } = useTimelineStore();
+  const { timeline, deselectClip } = useTimelineStore();
 
   if (!timeline) {
     return (
@@ -101,7 +102,7 @@ export function TimelinePanel() {
   }
 
   return (
-    <div className="flex-1 overflow-auto border-t border-border">
+    <div className="flex-1 overflow-auto border-t border-border" onClick={deselectClip}>
       {timeline.tracks.length === 0 && (
         <div className="p-4 text-center text-text-dim text-sm">
           Add a track to begin editing

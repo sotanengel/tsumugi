@@ -21,11 +21,17 @@ interface TimelineState {
   importMedia: (path: string) => Promise<void>;
   previewSource: string | null;
   setPreviewSource: (path: string | null) => void;
+  selectedClipId: string | null;
+  selectedTrackId: string | null;
+  selectClip: (trackId: string, clipId: string) => void;
+  deselectClip: () => void;
 }
 
 export const useTimelineStore = create<TimelineState>((set, get) => ({
   timeline: null,
   previewSource: null,
+  selectedClipId: null,
+  selectedTrackId: null,
   mediaLibrary: [],
   loading: false,
   error: null,
@@ -124,5 +130,21 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
 
   setPreviewSource: (path) => {
     set({ previewSource: path });
+  },
+
+  selectClip: (trackId, clipId) => {
+    const tl = get().timeline;
+    if (!tl) return;
+    const track = tl.tracks.find((t) => t.id === trackId);
+    const clip = track?.clips.find((c) => c.id === clipId);
+    set({
+      selectedClipId: clipId,
+      selectedTrackId: trackId,
+      previewSource: clip?.path ?? get().previewSource,
+    });
+  },
+
+  deselectClip: () => {
+    set({ selectedClipId: null, selectedTrackId: null });
   },
 }));
