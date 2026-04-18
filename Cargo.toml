@@ -1,7 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["apps/desktop/src-tauri"]
-# "crates/*" will be added when the first crate is created
+members = ["crates/*", "apps/desktop/src-tauri"]
 
 [workspace.package]
 version = "0.1.0"
