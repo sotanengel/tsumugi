@@ -4,7 +4,8 @@ import { useTimelineStore } from "../store/timeline-store";
 function toAssetUrl(filePath: string): string {
   // Tauri 2 macOS uses https://asset.localhost/ for serving local files.
   // convertFileSrc encodes '/' as '%2F' which breaks video playback.
-  return `https://asset.localhost/${encodeURI(filePath)}`;
+  const path = filePath.startsWith("/") ? filePath.slice(1) : filePath;
+  return `https://asset.localhost/${encodeURI(path)}`;
 }
 
 export function PreviewPanel() {
