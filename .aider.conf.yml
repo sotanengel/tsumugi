@@ -1,0 +1,7 @@
+read:
+  - AGENTS.md
+  - docs/agent-instructions.md
+auto-commits: false
+dirty-commits: false
+attribute-author: false
+attribute-committer: false
