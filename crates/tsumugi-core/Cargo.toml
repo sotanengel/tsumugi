@@ -1,0 +1,15 @@
+[package]
+name = "tsumugi-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Integration crate re-exporting all Tsumugi core modules"
+
+[dependencies]
+timeline-engine = { path = "../timeline-engine" }
+compositor = { path = "../compositor" }
+media-io = { path = "../media-io" }
+project-store = { path = "../project-store" }
+transcribe = { path = "../transcribe" }
