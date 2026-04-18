@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { AddClipArgs, MediaInfo, Timeline } from "@tsumugi/timeline-types";
+import type { AddClipArgs, Clip, MediaInfo, Timeline } from "@tsumugi/timeline-types";
 import * as api from "./api";
 
 interface TimelineState {
@@ -25,6 +25,12 @@ interface TimelineState {
   selectedTrackId: string | null;
   selectClip: (trackId: string, clipId: string) => void;
   deselectClip: () => void;
+  playbackRequested: "play" | "pause" | null;
+  togglePlayback: () => void;
+  clipboard: { clip: Clip; trackId: string } | null;
+  copySelectedClip: () => void;
+  cutSelectedClip: () => void;
+  pasteClip: () => void;
 }
 
 export const useTimelineStore = create<TimelineState>((set, get) => ({
@@ -32,6 +38,8 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
   previewSource: null,
   selectedClipId: null,
   selectedTrackId: null,
+  playbackRequested: null,
+  clipboard: null,
   mediaLibrary: [],
   loading: false,
   error: null,
@@ -146,5 +154,53 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
 
   deselectClip: () => {
     set({ selectedClipId: null, selectedTrackId: null });
+  },
+
+  togglePlayback: () => {
+    const current = get().playbackRequested;
+    set({ playbackRequested: current === "play" ? "pause" : "play" });
+  },
+
+  copySelectedClip: () => {
+    const { timeline, selectedClipId, selectedTrackId } = get();
+    if (!timeline || !selectedClipId || !selectedTrackId) return;
+    const track = timeline.tracks.find((t) => t.id === selectedTrackId);
+    const clip = track?.clips.find((c) => c.id === selectedClipId);
+    if (clip) {
+      set({ clipboard: { clip: { ...clip }, trackId: selectedTrackId } });
+    }
+  },
+
+  cutSelectedClip: () => {
+    const state = get();
+    state.copySelectedClip();
+    if (state.selectedTrackId && state.selectedClipId) {
+      state.removeClip(state.selectedTrackId, state.selectedClipId);
+      state.deselectClip();
+    }
+  },
+
+  pasteClip: () => {
+    const { clipboard, timeline, selectedTrackId } = get();
+    if (!clipboard || !timeline) return;
+    const trackId = selectedTrackId || clipboard.trackId;
+    const track = timeline.tracks.find((t) => t.id === trackId);
+    if (!track) return;
+
+    // Place at end of track
+    const lastEnd = track.clips.reduce(
+      (max, c) => Math.max(max, c.timeline_end),
+      0,
+    );
+    const duration = clipboard.clip.timeline_end - clipboard.clip.timeline_start;
+
+    get().addClip({
+      track_id: trackId,
+      kind: clipboard.clip.kind,
+      path: clipboard.clip.path,
+      text: clipboard.clip.text,
+      start: lastEnd,
+      end: lastEnd + duration,
+    });
   },
 }));
