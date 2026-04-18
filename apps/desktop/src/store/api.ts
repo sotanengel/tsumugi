@@ -13,6 +13,10 @@ export async function addTrack(name: string): Promise<Timeline> {
   return invoke<Timeline>("add_track_cmd", { name });
 }
 
+export async function removeTrack(trackId: string): Promise<Timeline> {
+  return invoke<Timeline>("remove_track_cmd", { trackId });
+}
+
 export async function addClip(args: AddClipArgs): Promise<Timeline> {
   return invoke<Timeline>("add_clip_cmd", { args });
 }

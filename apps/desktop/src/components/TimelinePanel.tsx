@@ -2,7 +2,7 @@ import type { Track as TrackType } from "@tsumugi/timeline-types";
 import { useTimelineStore } from "../store/timeline-store";
 
 function TrackRow({ track }: { track: TrackType }) {
-  const { removeClip } = useTimelineStore();
+  const { removeClip, removeTrack } = useTimelineStore();
 
   return (
     <div style={{
@@ -11,17 +11,37 @@ function TrackRow({ track }: { track: TrackType }) {
       minHeight: 48,
     }}>
       <div style={{
-        width: 100,
-        padding: "8px 6px",
+        width: 120,
+        padding: "6px 6px",
         background: "#16213e",
         borderRight: "1px solid #222",
         fontSize: 12,
         flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
       }}>
-        <div style={{ fontWeight: 600 }}>{track.name}</div>
-        <div style={{ color: "#666", fontSize: 10 }}>
-          {track.clips.length} clip{track.clips.length !== 1 ? "s" : ""}
+        <div>
+          <div style={{ fontWeight: 600 }}>{track.name}</div>
+          <div style={{ color: "#666", fontSize: 10 }}>
+            {track.clips.length} clip{track.clips.length !== 1 ? "s" : ""}
+          </div>
         </div>
+        <button
+          type="button"
+          onClick={() => removeTrack(track.id)}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#666",
+            cursor: "pointer",
+            fontSize: 14,
+            padding: "2px 4px",
+          }}
+          title="Delete track"
+        >
+          ×
+        </button>
       </div>
       <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center" }}>
         {track.clips.map((clip) => (
