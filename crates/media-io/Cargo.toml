@@ -1,0 +1,13 @@
+[package]
+name = "media-io"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "FFmpeg wrapper for media I/O in Tsumugi"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
