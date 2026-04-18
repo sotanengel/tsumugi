@@ -20,6 +20,7 @@ pub fn run() {
             commands::export_media,
             commands::undo_cmd,
             commands::redo_cmd,
+            commands::read_file_as_data_url,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -299,3 +299,60 @@ pub fn redo_cmd(state: State<AppState>) -> Result<TimelineDto, String> {
         None => Err("nothing to redo".into()),
     }
 }
+
+/// Read a file and return it as base64-encoded data URL.
+/// Used for video preview since asset:// protocol is unreliable.
+#[tauri::command]
+pub fn read_file_as_data_url(path: String) -> Result<String, String> {
+    use std::fs;
+
+    let file_path = PathBuf::from(&path);
+    if !file_path.exists() {
+        return Err(format!("file not found: {path}"));
+    }
+
+    let ext = file_path
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("")
+        .to_lowercase();
+
+    let mime = match ext.as_str() {
+        "mp4" | "m4v" => "video/mp4",
+        "mov" => "video/quicktime",
+        "webm" => "video/webm",
+        "mkv" => "video/x-matroska",
+        "mp3" => "audio/mpeg",
+        "wav" => "audio/wav",
+        "aac" => "audio/aac",
+        _ => "application/octet-stream",
+    };
+
+    let bytes = fs::read(&file_path).map_err(|e| e.to_string())?;
+    let b64 = base64_encode(&bytes);
+    Ok(format!("data:{mime};base64,{b64}"))
+}
+
+fn base64_encode(data: &[u8]) -> String {
+    const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let mut result = String::with_capacity(data.len() * 4 / 3 + 4);
+    for chunk in data.chunks(3) {
+        let b0 = chunk[0] as u32;
+        let b1 = chunk.get(1).copied().unwrap_or(0) as u32;
+        let b2 = chunk.get(2).copied().unwrap_or(0) as u32;
+        let triple = (b0 << 16) | (b1 << 8) | b2;
+        result.push(CHARS[(triple >> 18 & 0x3F) as usize] as char);
+        result.push(CHARS[(triple >> 12 & 0x3F) as usize] as char);
+        if chunk.len() > 1 {
+            result.push(CHARS[(triple >> 6 & 0x3F) as usize] as char);
+        } else {
+            result.push('=');
+        }
+        if chunk.len() > 2 {
+            result.push(CHARS[(triple & 0x3F) as usize] as char);
+        } else {
+            result.push('=');
+        }
+    }
+    result
+}
