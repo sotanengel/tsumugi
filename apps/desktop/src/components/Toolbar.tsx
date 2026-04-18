@@ -1,5 +1,27 @@
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { open } from "@tauri-apps/plugin-dialog";
 import { useTimelineStore } from "../store/timeline-store";
+
+function ToolbarButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger asChild>
+        <button type="button" onClick={onClick}>
+          {label}
+        </button>
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content
+          className="rounded bg-bg-track px-2 py-1 text-xs text-text-primary shadow-lg"
+          sideOffset={5}
+        >
+          {label}
+          <Tooltip.Arrow className="fill-bg-track" />
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
+  );
+}
 
 export function Toolbar() {
   const { addTrack, importMedia, createTimeline } = useTimelineStore();
@@ -23,17 +45,11 @@ export function Toolbar() {
   };
 
   return (
-    <div style={{
-      display: "flex",
-      gap: 8,
-      padding: "8px 12px",
-      borderBottom: "1px solid #333",
-      background: "#1a1a2e",
-    }}>
-      <button type="button" onClick={() => createTimeline(30)}>New Project</button>
-      <button type="button" onClick={handleImport}>Import Media</button>
-      <button type="button" onClick={() => addTrack("Video")}>+ Video Track</button>
-      <button type="button" onClick={() => addTrack("Audio")}>+ Audio Track</button>
+    <div className="flex gap-2 px-3 py-2 border-b border-border bg-bg-secondary">
+      <ToolbarButton label="New Project" onClick={() => createTimeline(30)} />
+      <ToolbarButton label="Import Media" onClick={handleImport} />
+      <ToolbarButton label="+ Video Track" onClick={() => addTrack("Video")} />
+      <ToolbarButton label="+ Audio Track" onClick={() => addTrack("Audio")} />
     </div>
   );
 }
