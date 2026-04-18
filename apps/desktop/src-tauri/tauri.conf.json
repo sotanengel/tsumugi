@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicepage/nicepage-default/refs/heads/main/dist/tauri-v2.json",
+  "productName": "Tsumugi",
+  "version": "0.1.0",
+  "identifier": "com.sotanengel.tsumugi",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "title": "Tsumugi",
+        "width": 1280,
+        "height": 720,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  }
+}
