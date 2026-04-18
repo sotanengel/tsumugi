@@ -1,0 +1,20 @@
+---
+description: Tsumugi project rules for Cursor AI
+globs:
+alwaysApply: true
+---
+
+# Tsumugi Project Rules
+
+Read `AGENTS.md` and `docs/agent-instructions.md` before making changes.
+
+## Key Rules
+
+- Rust stable only (no nightly)
+- Small PRs (300 lines max)
+- Conventional Commits (`feat:`, `fix:`, `chore:`)
+- Tests required for features
+- Crate isolation: traits for communication, one-way dependencies
+- Biome for TS/JS (not ESLint/Prettier)
+- GitHub Actions: SHA-pinned only
+- Verify: `make lint` and `make test` before completing
