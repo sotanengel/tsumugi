@@ -1,10 +1,44 @@
-import type { Track as TrackType } from "@tsumugi/timeline-types";
+import { useRef, useState } from "react";
+import type { MediaInfo, Track as TrackType } from "@tsumugi/timeline-types";
 import { useTimelineStore } from "../store/timeline-store";
 
 export const PIXELS_PER_FRAME = 2;
 
 function TrackRow({ track }: { track: TrackType }) {
-  const { removeClip, removeTrack } = useTimelineStore();
+  const { removeClip, removeTrack, addClip, timeline } = useTimelineStore();
+  const [dragOver, setDragOver] = useState(false);
+  const clipAreaRef = useRef<HTMLDivElement>(null);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes("application/tsumugi-media")) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+      setDragOver(true);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const raw = e.dataTransfer.getData("application/tsumugi-media");
+    if (!raw || !clipAreaRef.current || !timeline) return;
+
+    const media: MediaInfo = JSON.parse(raw);
+    const rect = clipAreaRef.current.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const startFrame = Math.max(0, Math.round(offsetX / PIXELS_PER_FRAME));
+    const durationFrames = Math.round(media.duration_secs * timeline.fps);
+    const endFrame = startFrame + durationFrames;
+
+    const kind = media.has_video ? "video" : "audio";
+    addClip({
+      track_id: track.id,
+      kind,
+      path: media.path,
+      start: startFrame,
+      end: endFrame,
+    });
+  };
 
   return (
     <div className="flex border-b border-border-dim min-h-12">
@@ -24,7 +58,13 @@ function TrackRow({ track }: { track: TrackType }) {
           ×
         </button>
       </div>
-      <div className="flex-1 relative flex items-center">
+      <div
+        ref={clipAreaRef}
+        className={`flex-1 relative flex items-center transition-colors ${dragOver ? "bg-blue-500/10 ring-1 ring-blue-400/50" : ""}`}
+        onDragOver={handleDragOver}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+      >
         {track.clips.map((clip) => (
           <div
             key={clip.id}
