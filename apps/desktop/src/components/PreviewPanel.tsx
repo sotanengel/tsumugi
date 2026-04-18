@@ -8,6 +8,7 @@ export function PreviewPanel() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   const assetUrl = previewSource ? convertFileSrc(previewSource) : null;
 
@@ -15,6 +16,7 @@ export function PreviewPanel() {
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
+    setVideoError(null);
   }, [previewSource]);
 
   // Respond to keyboard shortcut playback toggle
@@ -75,7 +77,16 @@ export function PreviewPanel() {
               if (videoRef.current) setDuration(videoRef.current.duration);
             }}
             onEnded={() => setIsPlaying(false)}
+            onError={() => {
+              const video = videoRef.current;
+              const code = video?.error?.code;
+              const msg = video?.error?.message || "unknown error";
+              setVideoError(`Video error (code ${code}): ${msg}. URL: ${assetUrl?.substring(0, 80)}`);
+            }}
           />
+          {videoError && (
+            <div className="text-error-text text-xs px-4 py-1 w-full">{videoError}</div>
+          )}
           <div className="flex items-center gap-2 w-full px-4 py-2 bg-bg-secondary">
             <button
               type="button"
