@@ -12,8 +12,12 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-shell = "2"
+tauri-plugin-dialog = "2"
 serde = { workspace = true }
 serde_json = { workspace = true }
+timeline-engine = { path = "../../../crates/timeline-engine" }
+media-io = { path = "../../../crates/media-io" }
+uuid = { workspace = true }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
